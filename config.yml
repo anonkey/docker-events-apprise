@@ -1,0 +1,6 @@
+- endpoint:
+    key: apprise
+  matchers:
+    - action:
+        - "health_status: unhealthy"
+        - oom
