@@ -100,7 +100,7 @@ async fn notify(
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    let mut event_handler = EventHandler::new(args)?;
+    let event_handler = EventHandler::new(args)?;
 
     loop {
         let mut event_stream = event_handler.docker_client.events::<String>(None);
