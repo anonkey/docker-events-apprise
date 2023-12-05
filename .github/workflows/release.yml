@@ -45,6 +45,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-assets:
+    permissions: write-all
     name: "Upload assets to Github releases"
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs:
@@ -74,6 +75,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   push-to-registry:
+    permissions: write-all
     name: "Push Docker image to Docker Hub"
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs:
