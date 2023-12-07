@@ -4,47 +4,17 @@ use bollard_next::service::{
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-fn match_with_vector_f<DataType, MatcherType, Callback: FnOnce(&MatcherType, &DataType) -> bool>(
-    matcher: Option<Vec<MatcherType>>,
-    value: Option<DataType>,
-    callback: Callback,
-) -> bool
-where
-    Callback: Copy,
-{
-    match matcher {
-        Some(values_vec) => match value {
-            Some(value) => values_vec
-                .iter()
-                .any(|match_value| callback(match_value, &value)),
-            None => false,
-        },
-        None => true,
-    }
-}
-
-fn match_with_vector<DataType>(matcher: Option<Vec<DataType>>, value: Option<DataType>) -> bool
-where
-    DataType: std::cmp::PartialEq,
-{
-    match matcher {
-        Some(values_vec) => match value {
-            Some(value) => values_vec.iter().any(|match_value| *match_value == value),
-            None => false,
-        },
-        None => true,
-    }
-}
+use crate::utils::{match_with_vector, match_with_vector_f, TypeOrVector};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ActorMatcher {
     /// The ID of the object emitting the event
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<Vec<String>>,
+    pub id: Option<TypeOrVector<String>>,
 
     /// Various key/value attributes of the object, depending on its type.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub attributes: Option<Vec<HashMap<String, Vec<String>>>>,
+    pub attributes: Option<TypeOrVector<HashMap<String, TypeOrVector<String>>>>,
 }
 
 impl ActorMatcher {
@@ -75,18 +45,18 @@ impl ActorMatcher {
 pub struct EventMatcher {
     /// The type of object emitting the event
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#type: Option<Vec<EventMessageTypeEnum>>,
+    pub r#type: Option<TypeOrVector<EventMessageTypeEnum>>,
 
     /// The type of event
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub action: Option<Vec<String>>,
+    pub action: Option<TypeOrVector<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub actor: Option<Vec<ActorMatcher>>,
+    pub actor: Option<TypeOrVector<ActorMatcher>>,
 
     /// Scope of the event. Engine events are `local` scope. Cluster (Swarm) events are `swarm` scope.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub scope: Option<Vec<EventMessageScopeEnum>>,
+    pub scope: Option<TypeOrVector<EventMessageScopeEnum>>,
 }
 
 impl EventMatcher {
